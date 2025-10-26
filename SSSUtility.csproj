@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyTitle>SSSUtility</AssemblyTitle>
+        <Product>SSSUtility</Product>
+        <TargetFramework>net481</TargetFramework>
+        <LangVersion>12.0</LangVersion>
+        <MapFileExtensions>true</MapFileExtensions>
+        <OutDir>bin\$(Configuration)_$(Platform)\</OutDir>
+        <Description>ServerSpecific Settings utility library for simplified menu creation</Description>
+
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>embedded</DebugType>
+        <Platforms>x64</Platforms>
+        
+        <!-- Cross-platform reference path -->
+        <ReferencePath Condition="'$(ReferencePath)' == ''">$(HOME)/Desktop/srxs</ReferencePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ExMod.Exiled" Version="9.9.2" />
+        
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net481" Version="1.0.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Reference Include="Assembly-CSharp" HintPath="$(ReferencePath)/Assembly-CSharp-Publicized.dll" Private="False" />
+        <Reference Include="UnityEngine.CoreModule" HintPath="$(ReferencePath)/UnityEngine.CoreModule.dll" Private="False" />
+        <Reference Include="UnityEngine.PhysicsModule" HintPath="$(ReferencePath)/UnityEngine.PhysicsModule.dll" Private="False" />
+        <Reference Include="Mirror.dll" HintPath="$(ReferencePath)/Mirror.dll" Private="False" />
+    </ItemGroup>
+</Project>
+
