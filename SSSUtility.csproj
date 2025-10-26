@@ -19,7 +19,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ExMod.Exiled" Version="9.9.2" />
+        <PackageReference Include="ExMod.Exiled" Version="9.10.0" />
         
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net481" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
