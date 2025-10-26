@@ -1,15 +1,6 @@
 # SSSUtility
 
-A utility plugin for Exiled that simplifies ServerSpecific Settings menu creation and management.
-
-## Features
-
-- **Fluent API**: Easy-to-use MenuBuilder for constructing complex menus
-- **Automatic ID Management**: Centralized SettingId allocation to prevent conflicts
-- **Multi-Page Navigation**: Built-in page management and navigation
-- **Event Routing**: Centralized event handling for all menu interactions
-- **Player Keybinds**: Support for player-configurable keybinds
-- **Settings Persistence**: Automatic saving and loading of player settings
+A utility plugin for Exiled that simplifies ServerSpecific Settings menu
 
 ## Quick Start
 
@@ -17,11 +8,11 @@ A utility plugin for Exiled that simplifies ServerSpecific Settings menu creatio
 // Create a menu
 var builder = MenuBuilder.Create("My Plugin Menu");
 
-builder.AddPage("Main Page")
-    .AddHeader("Welcome")
-    .AddButton("Click Me", (player) => player.ShowHint("Hello!"))
-    .AddKeybind("My Keybind", KeyCode.R, (player, key) => HandleKeybind(player, key))
-    .AddSlider("Volume", 0.5f, 0f, 1f, (player, value) => SetVolume(player, value))
+builder.AddPage("labubu")
+    .AddHeader("labubu")
+    .AddButton("labubu Me", (player) => player.ShowHint("labubu!"))
+    .AddKeybind("nobro", KeyCode.R, (player, key) => HandleKeybind(player, key))
+    .AddSlider("labubu noise", 0.5f, 0f, 1f, (player, value) => SetVolume(player, value))
 .EndPage();
 
 // Register the menu
@@ -52,21 +43,9 @@ MenuRegistry.Register("MyPlugin", menu);
 - `Unregister(string pluginName)` - Unregister a menu
 - `GetMenu(string pluginName)` - Get a registered menu
 
-## Architecture
-
-SSSUtility provides a clean abstraction layer over Exiled's ServerSpecific Settings system:
-
-- **MenuBuilder**: Fluent API for menu construction
-- **MenuRegistry**: Centralized menu management
-- **EventManager**: Handles all SSS events and routes them to appropriate callbacks
-- **PageManager**: Manages page navigation and state
-- **SettingIdRegistry**: Prevents ID conflicts between plugins
-
 ## Requirements
 
 - Exiled Framework
-- .NET Framework 4.8.1
-- SCP: Secret Laboratory
 
 ## License
 
