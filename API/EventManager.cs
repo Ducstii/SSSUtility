@@ -25,11 +25,11 @@ public static class EventManager
             var menu = MenuRegistry.GetMenuBySettingId(setting.SettingId);
             if (menu == null)
             {
-                // Not our setting, ignore
+                // This setting doesn't belong to any SSSUtility menu
                 return;
             }
 
-            // Route to appropriate handler based on setting type
+            // Figure out what type of setting this is and handle it accordingly
             switch (setting)
             {
                 case SSButton button:
@@ -78,23 +78,22 @@ public static class EventManager
 
     private static void HandleButton(Menu menu, ReferenceHub hub, SSButton button)
     {
-        // Check if it's the page selector
+        // Make sure this isn't accidentally the page selector (should be dropdown)
         if (menu.PageSelectorDropdown != null && button.SettingId == menu.PageSelectorDropdown.SettingId)
         {
-            // This shouldn't happen (page selector is dropdown), but handle just in case
             return;
         }
 
         var player = Player.Get(hub);
         if (player == null) return;
 
-        // Invoke individual callback if exists
+        // Run the specific action for this button
         if (menu.ButtonCallbacks.TryGetValue(button.SettingId, out var callback))
         {
             callback?.Invoke(player);
         }
 
-        // Invoke global callback
+        // Tell any other systems that this button was pressed
         menu.OnButtonPressed?.Invoke(player, button.SettingId, button);
     }
 
@@ -102,7 +101,7 @@ public static class EventManager
     {
         int selectedIndex = dropdown.SyncSelectionIndexValidated;
 
-        // Check if it's the page selector
+        // Handle page navigation if this is the page selector
         if (menu.PageSelectorDropdown != null && dropdown.SettingId == menu.PageSelectorDropdown.SettingId)
         {
             Core.PageManager.SwitchPage(hub, menu, selectedIndex);
@@ -112,13 +111,13 @@ public static class EventManager
         var player = Player.Get(hub);
         if (player == null) return;
 
-        // Invoke individual callback if exists
+        // Execute the handler for this dropdown selection
         if (menu.DropdownCallbacks.TryGetValue(dropdown.SettingId, out var callback))
         {
             callback?.Invoke(player, selectedIndex);
         }
 
-        // Invoke global callback
+        // Let other systems know about this dropdown change
         menu.OnDropdownChanged?.Invoke(player, dropdown.SettingId, selectedIndex, dropdown);
     }
 
@@ -129,57 +128,31 @@ public static class EventManager
         var player = Player.Get(hub);
         if (player == null) return;
 
-        // Invoke individual callback if exists
+        // Run the handler for this slider value
         if (menu.SliderCallbacks.TryGetValue(slider.SettingId, out var callback))
         {
             callback?.Invoke(player, value);
         }
 
-        // Invoke global callback
+        // Broadcast this slider change to any listeners
         menu.OnSliderChanged?.Invoke(player, slider.SettingId, value, slider);
     }
 
     private static void HandleKeybind(Menu menu, ReferenceHub hub, SSKeybindSetting keybind)
     {
-        // Keybind pressed state
         bool isPressed = keybind.SyncIsPressed;
         KeyCode key = keybind.AssignedKeyCode;
 
         var player = Player.Get(hub);
         if (player == null) return;
 
-        // Check if this is a Nexus keybind menu and route to KeybindManager
-        if (menu.Name == "Nexus-Keybinds")
-        {
-            try
-            {
-                // Import KeybindManager dynamically to avoid circular dependency
-                var keybindManagerType = Type.GetType("Nexus.Features.Menus.KeybindManager");
-                if (keybindManagerType != null)
-                {
-                    var onKeybindPressedMethod = keybindManagerType.GetMethod("OnKeybindPressed", 
-                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                    
-                    if (onKeybindPressedMethod != null && isPressed)
-                    {
-                        onKeybindPressedMethod.Invoke(null, new object[] { player, key });
-                        return; // Handled by KeybindManager, don't process further
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[SSSUtility] Error routing keybind to KeybindManager: {ex}");
-            }
-        }
-
-        // Invoke individual callback if exists
+        // Call the specific callback for this keybind
         if (menu.KeybindCallbacks.TryGetValue(keybind.SettingId, out var callback))
         {
             callback?.Invoke(player, key);
         }
 
-        // Invoke global callback
+        // Notify any global listeners about this keybind change
         menu.OnKeybindChanged?.Invoke(player, keybind.SettingId, key, keybind);
     }
 
@@ -190,13 +163,13 @@ public static class EventManager
         var player = Player.Get(hub);
         if (player == null) return;
 
-        // Invoke individual callback if exists
+        // Run the specific handler for this text input
         if (menu.PlaintextCallbacks.TryGetValue(plaintext.SettingId, out var callback))
         {
             callback?.Invoke(player, value);
         }
 
-        // Invoke global callback
+        // Let other systems know about this text change
         menu.OnPlaintextChanged?.Invoke(player, plaintext.SettingId, value, plaintext);
     }
 
@@ -207,32 +180,31 @@ public static class EventManager
         var player = Player.Get(hub);
         if (player == null) return;
 
-        // Invoke individual callback if exists
+        // Execute the handler for whichever button was pressed
         if (menu.TwoButtonsCallbacks.TryGetValue(twoButtons.SettingId, out var callback))
         {
             callback?.Invoke(player, isB);
         }
 
-        // Invoke global callback
+        // Broadcast this button press to any listeners
         menu.OnTwoButtonsPressed?.Invoke(player, twoButtons.SettingId, isB, twoButtons);
     }
 
     private static void HandleTextArea(Menu menu, ReferenceHub hub, SSTextArea textArea)
     {
-        // TextArea is read-only (ResponseMode = None), so we don't handle value changes
-        // Just invoke callbacks with the label
+        // TextArea is read-only, so we just pass along the display text
         string text = textArea.Label;
 
         var player = Player.Get(hub);
         if (player == null) return;
 
-        // Invoke individual callback if exists
+        // Call any specific handlers for this text area
         if (menu.TextAreaCallbacks.TryGetValue(textArea.SettingId, out var callback))
         {
             callback?.Invoke(player, text);
         }
 
-        // Invoke global callback
+        // Notify global listeners about this text area interaction
         menu.OnTextAreaChanged?.Invoke(player, textArea.SettingId, text, textArea);
     }
 }
