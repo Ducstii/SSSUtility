@@ -31,7 +31,7 @@ public static class ConflictResolver
         _version++;
         ServerSpecificSettingsSync.Version = _version;
 
-        Log.Info($"[SSSUtility] Rebuilt DefinedSettings with {allSettings.Count} total settings (version {_version})");
+        Log.Debug($"[SSSUtility] Rebuilt DefinedSettings with {allSettings.Count} total settings (version {_version})");
     }
 
     public static int GetVersion() => _version;
