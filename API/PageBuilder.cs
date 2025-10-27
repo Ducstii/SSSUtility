@@ -195,3 +195,32 @@ public class PageBuilder
     }
 }
 
+// Setting configurator for chaining configuration methods
+public class SettingConfigurator
+{
+    private readonly ServerSpecificSettingBase _setting;
+    
+    internal SettingConfigurator(ServerSpecificSettingBase setting)
+    {
+        _setting = setting;
+    }
+    
+    /// <summary>
+    /// Sets the collection ID for cross-server settings (0-19) or server-specific (255).
+    /// </summary>
+    public SettingConfigurator WithCollectionId(byte collectionId)
+    {
+        _setting.CollectionId = collectionId;
+        return this;
+    }
+    
+    /// <summary>
+    /// Marks the setting as server-only (client won't store its value).
+    /// </summary>
+    public SettingConfigurator ServerOnly()
+    {
+        _setting.IsServerOnly = true;
+        return this;
+    }
+}
+

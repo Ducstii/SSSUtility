@@ -24,9 +24,17 @@ namespace SSSUtility
             EventManager.Initialize();
 
             Exiled.Events.Handlers.Player.Verified += OnPlayerVerified;
+            Exiled.Events.Handlers.Player.Left += OnPlayerLeft;
             Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayers;
+            Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
 
             Log.Info($"[SSSUtility] v{Version} enabled");
+            
+            // Log diagnostic info if debug mode is enabled
+            if (Config.Debug)
+            {
+                Core.DiagnosticManager.LogDiagnostics();
+            }
             base.OnEnabled();
         }
 
@@ -35,7 +43,9 @@ namespace SSSUtility
             EventManager.Cleanup();
 
             Exiled.Events.Handlers.Player.Verified -= OnPlayerVerified;
+            Exiled.Events.Handlers.Player.Left -= OnPlayerLeft;
             Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingForPlayers;
+            Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
 
             MenuRegistry.Clear();
             PageManager.Clear();
@@ -48,11 +58,42 @@ namespace SSSUtility
 
         private void OnPlayerVerified(Exiled.Events.EventArgs.Player.VerifiedEventArgs ev)
         {
+            // Player state will be created when menu is sent
+        }
+
+        private void OnPlayerLeft(Exiled.Events.EventArgs.Player.LeftEventArgs ev)
+        {
+            try
+            {
+                // Clean up player's menu state to prevent memory leaks
+                if (ev.Player?.ReferenceHub != null)
+                {
+                    PageManager.RemoveState(ev.Player.ReferenceHub);
+                    if (Config.Debug)
+                    {
+                        Log.Debug($"[SSSUtility] Cleaned up menu state for {ev.Player.Nickname}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[SSSUtility] Error cleaning up menu state for {ev.Player?.Nickname ?? "unknown"}: {ex}");
+            }
         }
 
         private void OnWaitingForPlayers()
         {
             PageManager.Clear();
+        }
+
+        private void OnRoundStarted()
+        {
+            // Optional: Validate menus on round start
+            if (Config.Debug)
+            {
+                Log.Debug("[SSSUtility] Round started, validating menus...");
+                Core.DiagnosticManager.ValidateAllMenus();
+            }
         }
     }
 

@@ -9,6 +9,12 @@ public static class PageManager
 
     public static PlayerMenuState GetOrCreateState(ReferenceHub hub)
     {
+        if (hub == null)
+        {
+            Log.Warn("[SSSUtility] GetOrCreateState called with null hub");
+            return null;
+        }
+
         lock (_lock)
         {
             if (!_playerStates.TryGetValue(hub, out var state))
@@ -19,6 +25,7 @@ public static class PageManager
                     CurrentPageIndex = 0
                 };
                 _playerStates[hub] = state;
+                Log.Debug($"[SSSUtility] Created new menu state for player {hub.nicknameSync?.MyNick ?? "unknown"}");
             }
             return state;
         }
@@ -34,35 +41,66 @@ public static class PageManager
 
     public static void SwitchPage(ReferenceHub hub, Menu menu, int pageIndex)
     {
-        if (pageIndex < 0 || pageIndex >= menu.Pages.Count)
+        try
         {
-            Log.Warn($"[SSSUtility] Invalid page index {pageIndex} for menu '{menu.Name}'");
-            return;
+            if (hub == null)
+            {
+                Log.Warn("[SSSUtility] SwitchPage called with null hub");
+                return;
+            }
+
+            if (menu == null)
+            {
+                Log.Warn("[SSSUtility] SwitchPage called with null menu");
+                return;
+            }
+
+            if (pageIndex < 0 || pageIndex >= menu.Pages.Count)
+            {
+                Log.Warn($"[SSSUtility] Invalid page index {pageIndex} for menu '{menu.Name}' (pages: {menu.Pages.Count})");
+                return;
+            }
+
+            var state = GetOrCreateState(hub);
+            if (state == null)
+            {
+                Log.Warn("[SSSUtility] Failed to get or create state for SwitchPage");
+                return;
+            }
+
+            int oldPageIndex = state.CurrentPageIndex;
+            state.CurrentPageIndex = pageIndex;
+            state.CurrentMenuPlugin = menu.PluginName;
+
+            // Call page callbacks
+            if (oldPageIndex >= 0 && oldPageIndex < menu.Pages.Count)
+            {
+                var player = Player.Get(hub);
+                if (player != null)
+                {
+                    menu.Pages[oldPageIndex].OnPageExit?.Invoke(player);
+                }
+            }
+
+            var newPage = menu.Pages[pageIndex];
+            if (newPage.OnPageEnter != null)
+            {
+                var player = Player.Get(hub);
+                if (player != null)
+                {
+                    newPage.OnPageEnter?.Invoke(player);
+                }
+            }
+
+            // Send new page content
+            ServerSpecificSettingsSync.SendToPlayer(hub, newPage.CombinedEntries);
+
+            Log.Debug($"[SSSUtility] Switched player {hub.nicknameSync?.MyNick ?? "unknown"} to page {pageIndex} ({newPage.Name})");
         }
-
-        var state = GetOrCreateState(hub);
-        int oldPageIndex = state.CurrentPageIndex;
-        state.CurrentPageIndex = pageIndex;
-        state.CurrentMenuPlugin = menu.PluginName;
-
-        // Call page callbacks
-        if (oldPageIndex >= 0 && oldPageIndex < menu.Pages.Count)
+        catch (Exception ex)
         {
-            var player = Player.Get(hub);
-            menu.Pages[oldPageIndex].OnPageExit?.Invoke(player);
+            Log.Error($"[SSSUtility] Error in SwitchPage: {ex}");
         }
-
-        var newPage = menu.Pages[pageIndex];
-        if (newPage.OnPageEnter != null)
-        {
-            var player = Player.Get(hub);
-            newPage.OnPageEnter?.Invoke(player);
-        }
-
-        // Send new page content
-        ServerSpecificSettingsSync.SendToPlayer(hub, newPage.CombinedEntries);
-
-        Log.Debug($"[SSSUtility] Switched player {hub.nicknameSync.MyNick} to page {pageIndex} ({newPage.Name})");
     }
 
     public static void SendMenu(ReferenceHub hub, Menu menu, int pageIndex = 0)

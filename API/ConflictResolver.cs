@@ -9,29 +9,76 @@ public static class ConflictResolver
 
     public static void AssignIdsAndRebuild(Menu menu)
     {
-        int startId = _nextAvailableId;
-        menu.RemapIds(startId);
-        _nextAvailableId = menu.IdRangeEnd + 1;
+        try
+        {
+            if (menu == null)
+            {
+                Log.Error("[SSSUtility] AssignIdsAndRebuild called with null menu");
+                return;
+            }
 
-        Log.Debug($"[SSSUtility] Assigned ID range {menu.IdRangeStart}-{menu.IdRangeEnd} to menu '{menu.Name}'");
+            int startId = _nextAvailableId;
+            
+            // Validate we won't overflow int.MaxValue
+            if (startId < 0 || startId > int.MaxValue - 10000)
+            {
+                Log.Error($"[SSSUtility] ID range exhausted! _nextAvailableId={startId}");
+                _nextAvailableId = 10000; // Reset to start
+                startId = _nextAvailableId;
+            }
 
-        RebuildDefinedSettings();
+            menu.RemapIds(startId);
+            _nextAvailableId = menu.IdRangeEnd + 1;
+
+            Log.Debug($"[SSSUtility] Assigned ID range {menu.IdRangeStart}-{menu.IdRangeEnd} to menu '{menu.Name}'");
+
+            RebuildDefinedSettings();
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[SSSUtility] Error in AssignIdsAndRebuild: {ex}");
+        }
     }
 
     public static void RebuildDefinedSettings()
     {
-        var allSettings = new List<ServerSpecificSettingBase>();
-
-        foreach (var menu in MenuRegistry.GetAllMenus())
+        try
         {
-            allSettings.AddRange(menu.GetAllSettings());
+            var allSettings = new List<ServerSpecificSettingBase>();
+
+            foreach (var menu in MenuRegistry.GetAllMenus())
+            {
+                try
+                {
+                    var settings = menu.GetAllSettings();
+                    allSettings.AddRange(settings);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[SSSUtility] Error getting settings from menu '{menu.Name}': {ex}");
+                }
+            }
+
+            // Validate array before assigning
+            if (allSettings == null || allSettings.Count == 0)
+            {
+                Log.Warn("[SSSUtility] RebuildDefinedSettings: No settings to register");
+                ServerSpecificSettingsSync.DefinedSettings = Array.Empty<ServerSpecificSettingBase>();
+            }
+            else
+            {
+                ServerSpecificSettingsSync.DefinedSettings = allSettings.ToArray();
+            }
+
+            _version++;
+            ServerSpecificSettingsSync.Version = _version;
+
+            Log.Debug($"[SSSUtility] Rebuilt DefinedSettings with {allSettings.Count} total settings (version {_version})");
         }
-
-        ServerSpecificSettingsSync.DefinedSettings = allSettings.ToArray();
-        _version++;
-        ServerSpecificSettingsSync.Version = _version;
-
-        Log.Debug($"[SSSUtility] Rebuilt DefinedSettings with {allSettings.Count} total settings (version {_version})");
+        catch (Exception ex)
+        {
+            Log.Error($"[SSSUtility] Critical error in RebuildDefinedSettings: {ex}");
+        }
     }
 
     public static int GetVersion() => _version;
@@ -40,6 +87,43 @@ public static class ConflictResolver
     {
         _nextAvailableId = 10000;
         _version = 1;
+        Log.Debug("[SSSUtility] ConflictResolver reset");
+    }
+
+    /// <summary>
+    /// Validates that a menu's ID range doesn't conflict with existing menus.
+    /// </summary>
+    public static bool ValidateIdRange(Menu newMenu)
+    {
+        try
+        {
+            if (newMenu == null)
+            {
+                return false;
+            }
+
+            var allMenus = MenuRegistry.GetAllMenus();
+            foreach (var existingMenu in allMenus)
+            {
+                if (existingMenu == newMenu || existingMenu.PluginName == newMenu.PluginName)
+                    continue;
+
+                // Check for overlap
+                if (newMenu.IdRangeStart <= existingMenu.IdRangeEnd && 
+                    newMenu.IdRangeEnd >= existingMenu.IdRangeStart)
+                {
+                    Log.Error($"[SSSUtility] ID range conflict: '{newMenu.Name}' ({newMenu.IdRangeStart}-{newMenu.IdRangeEnd}) " +
+                             $"overlaps '{existingMenu.Name}' ({existingMenu.IdRangeStart}-{existingMenu.IdRangeEnd})");
+                    return false;
+                }
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[SSSUtility] Error validating ID range: {ex}");
+            return false;
+        }
     }
 }
 

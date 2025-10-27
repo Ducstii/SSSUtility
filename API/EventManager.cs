@@ -22,10 +22,22 @@ public static class EventManager
     {
         try
         {
+            if (hub == null)
+            {
+                Log.Warn("[SSSUtility] Received setting value from null hub");
+                return;
+            }
+            
+            if (setting == null)
+            {
+                Log.Warn($"[SSSUtility] Received null setting from {hub.nicknameSync?.MyNick ?? "unknown"}");
+                return;
+            }
+
             var menu = MenuRegistry.GetMenuBySettingId(setting.SettingId);
             if (menu == null)
             {
-                // This setting doesn't belong to any SSSUtility menu
+                // This setting doesn't belong to any SSSUtility menu - this is normal
                 return;
             }
 
@@ -53,11 +65,15 @@ public static class EventManager
                 case SSTextArea textArea:
                     HandleTextArea(menu, hub, textArea);
                     break;
+                default:
+                    Log.Debug($"[SSSUtility] Unknown setting type: {setting.GetType().Name} (ID: {setting.SettingId})");
+                    break;
             }
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error handling setting value: {ex}");
+            Log.Error($"[SSSUtility] Error handling setting value from {hub?.nicknameSync?.MyNick ?? "unknown"}: {ex}");
+            Log.Error($"[SSSUtility] Setting ID: {setting?.SettingId ?? -1}, Type: {setting?.GetType().Name ?? "null"}");
         }
     }
 
@@ -78,134 +94,253 @@ public static class EventManager
 
     private static void HandleButton(Menu menu, ReferenceHub hub, SSButton button)
     {
-        // Make sure this isn't accidentally the page selector (should be dropdown)
-        if (menu.PageSelectorDropdown != null && button.SettingId == menu.PageSelectorDropdown.SettingId)
+        try
         {
-            return;
+            if (menu == null || hub == null || button == null)
+            {
+                Log.Warn("[SSSUtility] HandleButton called with null parameter");
+                return;
+            }
+
+            // Make sure this isn't accidentally the page selector (should be dropdown)
+            if (menu.PageSelectorDropdown != null && button.SettingId == menu.PageSelectorDropdown.SettingId)
+            {
+                return;
+            }
+
+            var player = Player.Get(hub);
+            if (player == null)
+            {
+                Log.Warn($"[SSSUtility] Could not get player for hub {hub.nicknameSync?.MyNick ?? "unknown"}");
+                return;
+            }
+
+            // Run the specific action for this button
+            if (menu.ButtonCallbacks.TryGetValue(button.SettingId, out var callback))
+            {
+                callback?.Invoke(player);
+            }
+
+            // Tell any other systems that this button was pressed
+            menu.OnButtonPressed?.Invoke(player, button.SettingId, button);
         }
-
-        var player = Player.Get(hub);
-        if (player == null) return;
-
-        // Run the specific action for this button
-        if (menu.ButtonCallbacks.TryGetValue(button.SettingId, out var callback))
+        catch (Exception ex)
         {
-            callback?.Invoke(player);
+            Log.Error($"[SSSUtility] Error in HandleButton: {ex}");
         }
-
-        // Tell any other systems that this button was pressed
-        menu.OnButtonPressed?.Invoke(player, button.SettingId, button);
     }
 
     private static void HandleDropdown(Menu menu, ReferenceHub hub, SSDropdownSetting dropdown)
     {
-        int selectedIndex = dropdown.SyncSelectionIndexValidated;
-
-        // Handle page navigation if this is the page selector
-        if (menu.PageSelectorDropdown != null && dropdown.SettingId == menu.PageSelectorDropdown.SettingId)
+        try
         {
-            Core.PageManager.SwitchPage(hub, menu, selectedIndex);
-            return;
+            if (menu == null || hub == null || dropdown == null)
+            {
+                Log.Warn("[SSSUtility] HandleDropdown called with null parameter");
+                return;
+            }
+
+            int selectedIndex = dropdown.SyncSelectionIndexValidated;
+
+            // Handle page navigation if this is the page selector
+            if (menu.PageSelectorDropdown != null && dropdown.SettingId == menu.PageSelectorDropdown.SettingId)
+            {
+                Core.PageManager.SwitchPage(hub, menu, selectedIndex);
+                return;
+            }
+
+            var player = Player.Get(hub);
+            if (player == null)
+            {
+                Log.Warn($"[SSSUtility] Could not get player for hub {hub.nicknameSync?.MyNick ?? "unknown"}");
+                return;
+            }
+
+            // Execute the handler for this dropdown selection
+            if (menu.DropdownCallbacks.TryGetValue(dropdown.SettingId, out var callback))
+            {
+                callback?.Invoke(player, selectedIndex);
+            }
+
+            // Let other systems know about this dropdown change
+            menu.OnDropdownChanged?.Invoke(player, dropdown.SettingId, selectedIndex, dropdown);
         }
-
-        var player = Player.Get(hub);
-        if (player == null) return;
-
-        // Execute the handler for this dropdown selection
-        if (menu.DropdownCallbacks.TryGetValue(dropdown.SettingId, out var callback))
+        catch (Exception ex)
         {
-            callback?.Invoke(player, selectedIndex);
+            Log.Error($"[SSSUtility] Error in HandleDropdown: {ex}");
         }
-
-        // Let other systems know about this dropdown change
-        menu.OnDropdownChanged?.Invoke(player, dropdown.SettingId, selectedIndex, dropdown);
     }
 
     private static void HandleSlider(Menu menu, ReferenceHub hub, SSSliderSetting slider)
     {
-        float value = slider.SyncFloatValue;
-
-        var player = Player.Get(hub);
-        if (player == null) return;
-
-        // Run the handler for this slider value
-        if (menu.SliderCallbacks.TryGetValue(slider.SettingId, out var callback))
+        try
         {
-            callback?.Invoke(player, value);
-        }
+            if (menu == null || hub == null || slider == null)
+            {
+                Log.Warn("[SSSUtility] HandleSlider called with null parameter");
+                return;
+            }
 
-        // Broadcast this slider change to any listeners
-        menu.OnSliderChanged?.Invoke(player, slider.SettingId, value, slider);
+            float value = slider.SyncFloatValue;
+
+            var player = Player.Get(hub);
+            if (player == null)
+            {
+                Log.Warn($"[SSSUtility] Could not get player for hub {hub.nicknameSync?.MyNick ?? "unknown"}");
+                return;
+            }
+
+            // Run the handler for this slider value
+            if (menu.SliderCallbacks.TryGetValue(slider.SettingId, out var callback))
+            {
+                callback?.Invoke(player, value);
+            }
+
+            // Broadcast this slider change to any listeners
+            menu.OnSliderChanged?.Invoke(player, slider.SettingId, value, slider);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[SSSUtility] Error in HandleSlider: {ex}");
+        }
     }
 
     private static void HandleKeybind(Menu menu, ReferenceHub hub, SSKeybindSetting keybind)
     {
-        bool isPressed = keybind.SyncIsPressed;
-        KeyCode key = keybind.AssignedKeyCode;
-
-        var player = Player.Get(hub);
-        if (player == null) return;
-
-        // Call the specific callback for this keybind
-        if (menu.KeybindCallbacks.TryGetValue(keybind.SettingId, out var callback))
+        try
         {
-            callback?.Invoke(player, key);
-        }
+            if (menu == null || hub == null || keybind == null)
+            {
+                Log.Warn("[SSSUtility] HandleKeybind called with null parameter");
+                return;
+            }
 
-        // Notify any global listeners about this keybind change
-        menu.OnKeybindChanged?.Invoke(player, keybind.SettingId, key, keybind);
+            bool isPressed = keybind.SyncIsPressed;
+            KeyCode key = keybind.AssignedKeyCode;
+
+            var player = Player.Get(hub);
+            if (player == null)
+            {
+                Log.Warn($"[SSSUtility] Could not get player for hub {hub.nicknameSync?.MyNick ?? "unknown"}");
+                return;
+            }
+
+            // Call the specific callback for this keybind
+            if (menu.KeybindCallbacks.TryGetValue(keybind.SettingId, out var callback))
+            {
+                callback?.Invoke(player, key);
+            }
+
+            // Notify any global listeners about this keybind change
+            menu.OnKeybindChanged?.Invoke(player, keybind.SettingId, key, keybind);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[SSSUtility] Error in HandleKeybind: {ex}");
+        }
     }
 
     private static void HandlePlaintext(Menu menu, ReferenceHub hub, SSPlaintextSetting plaintext)
     {
-        string value = plaintext.SyncInputText;
-
-        var player = Player.Get(hub);
-        if (player == null) return;
-
-        // Run the specific handler for this text input
-        if (menu.PlaintextCallbacks.TryGetValue(plaintext.SettingId, out var callback))
+        try
         {
-            callback?.Invoke(player, value);
-        }
+            if (menu == null || hub == null || plaintext == null)
+            {
+                Log.Warn("[SSSUtility] HandlePlaintext called with null parameter");
+                return;
+            }
 
-        // Let other systems know about this text change
-        menu.OnPlaintextChanged?.Invoke(player, plaintext.SettingId, value, plaintext);
+            string value = plaintext.SyncInputText;
+
+            var player = Player.Get(hub);
+            if (player == null)
+            {
+                Log.Warn($"[SSSUtility] Could not get player for hub {hub.nicknameSync?.MyNick ?? "unknown"}");
+                return;
+            }
+
+            // Run the specific handler for this text input
+            if (menu.PlaintextCallbacks.TryGetValue(plaintext.SettingId, out var callback))
+            {
+                callback?.Invoke(player, value);
+            }
+
+            // Let other systems know about this text change
+            menu.OnPlaintextChanged?.Invoke(player, plaintext.SettingId, value, plaintext);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[SSSUtility] Error in HandlePlaintext: {ex}");
+        }
     }
 
     private static void HandleTwoButtons(Menu menu, ReferenceHub hub, SSTwoButtonsSetting twoButtons)
     {
-        bool isB = twoButtons.SyncIsB;
-
-        var player = Player.Get(hub);
-        if (player == null) return;
-
-        // Execute the handler for whichever button was pressed
-        if (menu.TwoButtonsCallbacks.TryGetValue(twoButtons.SettingId, out var callback))
+        try
         {
-            callback?.Invoke(player, isB);
-        }
+            if (menu == null || hub == null || twoButtons == null)
+            {
+                Log.Warn("[SSSUtility] HandleTwoButtons called with null parameter");
+                return;
+            }
 
-        // Broadcast this button press to any listeners
-        menu.OnTwoButtonsPressed?.Invoke(player, twoButtons.SettingId, isB, twoButtons);
+            bool isB = twoButtons.SyncIsB;
+
+            var player = Player.Get(hub);
+            if (player == null)
+            {
+                Log.Warn($"[SSSUtility] Could not get player for hub {hub.nicknameSync?.MyNick ?? "unknown"}");
+                return;
+            }
+
+            // Execute the handler for whichever button was pressed
+            if (menu.TwoButtonsCallbacks.TryGetValue(twoButtons.SettingId, out var callback))
+            {
+                callback?.Invoke(player, isB);
+            }
+
+            // Broadcast this button press to any listeners
+            menu.OnTwoButtonsPressed?.Invoke(player, twoButtons.SettingId, isB, twoButtons);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[SSSUtility] Error in HandleTwoButtons: {ex}");
+        }
     }
 
     private static void HandleTextArea(Menu menu, ReferenceHub hub, SSTextArea textArea)
     {
-        // TextArea is read-only, so we just pass along the display text
-        string text = textArea.Label;
-
-        var player = Player.Get(hub);
-        if (player == null) return;
-
-        // Call any specific handlers for this text area
-        if (menu.TextAreaCallbacks.TryGetValue(textArea.SettingId, out var callback))
+        try
         {
-            callback?.Invoke(player, text);
-        }
+            if (menu == null || hub == null || textArea == null)
+            {
+                Log.Warn("[SSSUtility] HandleTextArea called with null parameter");
+                return;
+            }
 
-        // Notify global listeners about this text area interaction
-        menu.OnTextAreaChanged?.Invoke(player, textArea.SettingId, text, textArea);
+            // TextArea is read-only, so we just pass along the display text
+            string text = textArea.Label;
+
+            var player = Player.Get(hub);
+            if (player == null)
+            {
+                Log.Warn($"[SSSUtility] Could not get player for hub {hub.nicknameSync?.MyNick ?? "unknown"}");
+                return;
+            }
+
+            // Call any specific handlers for this text area
+            if (menu.TextAreaCallbacks.TryGetValue(textArea.SettingId, out var callback))
+            {
+                callback?.Invoke(player, text);
+            }
+
+            // Notify global listeners about this text area interaction
+            menu.OnTextAreaChanged?.Invoke(player, textArea.SettingId, text, textArea);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[SSSUtility] Error in HandleTextArea: {ex}");
+        }
     }
 }
 
