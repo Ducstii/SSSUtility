@@ -2,18 +2,8 @@ namespace SSSUtility.API;
 
 using SSSUtility.Models;
 
-/// <summary>
-/// Provides methods to query player setting values and menu state.
-/// </summary>
 public static class SettingQueries
 {
-    /// <summary>
-    /// Gets a player's current value for a specific setting.
-    /// </summary>
-    /// <typeparam name="T">The setting type (e.g., SSDropdownSetting, SSSliderSetting)</typeparam>
-    /// <param name="player">The player to query</param>
-    /// <param name="settingId">The setting ID</param>
-    /// <returns>The player's setting value, or null if not found</returns>
     public static T GetPlayerSettingValue<T>(Player player, int settingId) where T : ServerSpecificSettingBase
     {
         if (player == null || player.ReferenceHub == null)
@@ -33,14 +23,6 @@ public static class SettingQueries
         }
     }
 
-    /// <summary>
-    /// Tries to get a player's current value for a specific setting.
-    /// </summary>
-    /// <typeparam name="T">The setting type</typeparam>
-    /// <param name="player">The player to query</param>
-    /// <param name="settingId">The setting ID</param>
-    /// <param name="value">The setting value if found</param>
-    /// <returns>True if the setting was found, false otherwise</returns>
     public static bool TryGetPlayerSettingValue<T>(Player player, int settingId, out T value) where T : ServerSpecificSettingBase
     {
         value = null;
@@ -61,11 +43,6 @@ public static class SettingQueries
         }
     }
 
-    /// <summary>
-    /// Checks if a player has the menu tab open.
-    /// </summary>
-    /// <param name="player">The player to check</param>
-    /// <returns>True if the tab is open, false otherwise</returns>
     public static bool IsPlayerTabOpen(Player player)
     {
         if (player == null || player.ReferenceHub == null)
@@ -84,11 +61,6 @@ public static class SettingQueries
         }
     }
 
-    /// <summary>
-    /// Gets the menu version the player has.
-    /// </summary>
-    /// <param name="player">The player to check</param>
-    /// <returns>The player's menu version, or 0 if unavailable</returns>
     public static int GetPlayerVersion(Player player)
     {
         if (player == null || player.ReferenceHub == null)
@@ -107,11 +79,6 @@ public static class SettingQueries
         }
     }
 
-    /// <summary>
-    /// Checks if a player's menu is outdated compared to the server.
-    /// </summary>
-    /// <param name="player">The player to check</param>
-    /// <returns>True if the player's menu version is outdated</returns>
     public static bool IsPlayerMenuOutdated(Player player)
     {
         if (player == null || player.ReferenceHub == null)
@@ -131,11 +98,6 @@ public static class SettingQueries
         }
     }
 
-    /// <summary>
-    /// Resets all settings in a menu to their default values for a specific player.
-    /// </summary>
-    /// <param name="player">The player to reset</param>
-    /// <param name="menu">The menu containing the settings</param>
     public static void ResetPlayerSettings(Player player, Menu menu)
     {
         if (player == null || player.ReferenceHub == null)
@@ -171,12 +133,6 @@ public static class SettingQueries
         }
     }
 
-    /// <summary>
-    /// Gets the current page index for a player viewing a menu.
-    /// </summary>
-    /// <param name="player">The player to check</param>
-    /// <param name="menuPluginName">The plugin name of the menu</param>
-    /// <returns>The current page index, or -1 if not viewing the menu</returns>
     public static int GetPlayerCurrentPage(Player player, string menuPluginName)
     {
         if (player == null || player.ReferenceHub == null)
@@ -200,12 +156,6 @@ public static class SettingQueries
         }
     }
 
-    /// <summary>
-    /// Checks if a player is currently viewing a specific menu.
-    /// </summary>
-    /// <param name="player">The player to check</param>
-    /// <param name="menuPluginName">The plugin name of the menu</param>
-    /// <returns>True if the player is viewing the menu</returns>
     public static bool IsPlayerViewingMenu(Player player, string menuPluginName)
     {
         return GetPlayerCurrentPage(player, menuPluginName) >= 0;

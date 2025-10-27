@@ -1,8 +1,5 @@
 namespace SSSUtility.Models;
 
-/// <summary>
-/// Complete menu data structure with pages, callbacks, and metadata.
-/// </summary>
 public class Menu
 {
     public string Name { get; set; }
@@ -43,9 +40,6 @@ public class Menu
         Name = name;
     }
 
-    /// <summary>
-    /// Remaps all SettingIds to a new range to avoid conflicts.
-    /// </summary>
     public void RemapIds(int startId)
     {
         IdRangeStart = startId;
@@ -99,9 +93,6 @@ public class Menu
         }
     }
 
-    /// <summary>
-    /// Gets all settings across all pages.
-    /// </summary>
     public IEnumerable<ServerSpecificSettingBase> GetAllSettings()
     {
         if (PageSelectorDropdown != null)

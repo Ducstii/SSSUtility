@@ -2,9 +2,6 @@ namespace SSSUtility.API;
 
 using SSSUtility.Models;
 
-/// <summary>
-/// Fluent API for building a single page with various setting types.
-/// </summary>
 public class PageBuilder
 {
     private readonly MenuBuilder _menuBuilder;
@@ -19,9 +16,6 @@ public class PageBuilder
 
     internal MenuPage Build() => _page;
 
-    /// <summary>
-    /// Adds a group header/separator.
-    /// </summary>
     public PageBuilder AddHeader(string text, bool reducedPadding = false)
     {
         var header = new SSGroupHeader(_nextLocalId++, text) { ReducedPadding = reducedPadding };
@@ -29,9 +23,6 @@ public class PageBuilder
         return this;
     }
 
-    /// <summary>
-    /// Adds a clickable button.
-    /// </summary>
     public PageBuilder AddButton(string label, Action<Player> onPress = null, float holdTime = 0f, string hint = null)
     {
         var button = new SSButton(_nextLocalId++, label, hint ?? label, holdTime);
@@ -45,9 +36,6 @@ public class PageBuilder
         return this;
     }
 
-    /// <summary>
-    /// Adds a dropdown selector.
-    /// </summary>
     public PageBuilder AddDropdown(string label, string[] options, Action<Player, int> onChange = null, 
         SSDropdownSetting.DropdownEntryType type = SSDropdownSetting.DropdownEntryType.Regular, string hint = null)
     {
@@ -65,9 +53,6 @@ public class PageBuilder
         return this;
     }
 
-    /// <summary>
-    /// Adds a numeric slider.
-    /// </summary>
     public PageBuilder AddSlider(string label, float min, float max, float defaultValue = 0f, 
         Action<Player, float> onChange = null, string hint = null)
     {
@@ -86,9 +71,6 @@ public class PageBuilder
         return this;
     }
 
-    /// <summary>
-    /// Adds a keybind input.
-    /// </summary>
     public PageBuilder AddKeybind(string label, KeyCode defaultKey = KeyCode.None, 
         Action<Player, KeyCode> onChange = null, string hint = null)
     {
@@ -106,9 +88,6 @@ public class PageBuilder
         return this;
     }
 
-    /// <summary>
-    /// Adds a text input field. Note: Requires Assembly-CSharp with TMPro types.
-    /// </summary>
     public PageBuilder AddPlaintext(string label, int maxLength = 64, Action<Player, string> onChange = null, 
         string placeholder = "...", string hint = null)
     {
@@ -132,9 +111,6 @@ public class PageBuilder
         return this;
     }
 
-    /// <summary>
-    /// Adds a multi-line text area. Note: Requires Assembly-CSharp with TMPro types.
-    /// </summary>
     public PageBuilder AddTextArea(string label, SSTextArea.FoldoutMode mode = SSTextArea.FoldoutMode.NotCollapsable, 
         Action<Player, string> onChange = null, string placeholder = null, string hint = null)
     {
@@ -158,9 +134,6 @@ public class PageBuilder
         return this;
     }
 
-    /// <summary>
-    /// Adds a two-button control.
-    /// </summary>
     public PageBuilder AddTwoButtons(string label, string leftLabel, string rightLabel, 
         Action<Player, bool> onPress = null, string hint = null)
     {
@@ -178,17 +151,11 @@ public class PageBuilder
         return this;
     }
 
-    /// <summary>
-    /// Helper: Adds a toggle (uses TwoButtons with "Off"/"On").
-    /// </summary>
     public PageBuilder AddToggle(string label, bool defaultValue = false, Action<Player, bool> onChange = null, string hint = null)
     {
         return AddTwoButtons(label, "Off", "On", onChange, hint);
     }
 
-    /// <summary>
-    /// Completes this page and returns to menu builder.
-    /// </summary>
     public MenuBuilder EndPage()
     {
         return _menuBuilder;
@@ -205,18 +172,12 @@ public class SettingConfigurator
         _setting = setting;
     }
     
-    /// <summary>
-    /// Sets the collection ID for cross-server settings (0-19) or server-specific (255).
-    /// </summary>
     public SettingConfigurator WithCollectionId(byte collectionId)
     {
         _setting.CollectionId = collectionId;
         return this;
     }
     
-    /// <summary>
-    /// Marks the setting as server-only (client won't store its value).
-    /// </summary>
     public SettingConfigurator ServerOnly()
     {
         _setting.IsServerOnly = true;

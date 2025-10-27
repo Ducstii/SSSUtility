@@ -3,14 +3,8 @@ namespace SSSUtility.Core;
 using SSSUtility.API;
 using SSSUtility.Models;
 
-/// <summary>
-/// Provides diagnostic information and health monitoring for SSSUtility.
-/// </summary>
 public static class DiagnosticManager
 {
-    /// <summary>
-    /// Health check report.
-    /// </summary>
     public class HealthReport
     {
         public bool IsHealthy { get; set; }
@@ -21,9 +15,6 @@ public static class DiagnosticManager
         public List<string> Issues { get; set; } = new();
     }
 
-    /// <summary>
-    /// Performs a comprehensive health check.
-    /// </summary>
     public static HealthReport PerformHealthCheck()
     {
         var report = new HealthReport();
@@ -73,9 +64,6 @@ public static class DiagnosticManager
         }
     }
 
-    /// <summary>
-    /// Logs diagnostic information to console.
-    /// </summary>
     public static void LogDiagnostics()
     {
         try
@@ -125,9 +113,6 @@ public static class DiagnosticManager
         }
     }
 
-    /// <summary>
-    /// Gets detailed statistics about menu registry.
-    /// </summary>
     public static void LogRegistryStats()
     {
         try
@@ -173,9 +158,6 @@ public static class DiagnosticManager
         }
     }
 
-    /// <summary>
-    /// Validates all registered menus.
-    /// </summary>
     public static bool ValidateAllMenus()
     {
         try

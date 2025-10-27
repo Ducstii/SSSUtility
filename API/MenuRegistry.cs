@@ -108,9 +108,6 @@ public static class MenuRegistry
         }
     }
 
-    /// <summary>
-    /// Gets statistics about registered menus.
-    /// </summary>
     public static (int MenuCount, int TotalSettings, int TotalPages) GetStats()
     {
         lock (_lock)
@@ -139,9 +136,6 @@ public static class MenuRegistry
         }
     }
 
-    /// <summary>
-    /// Validates that all registered menus are valid and have no ID conflicts.
-    /// </summary>
     public static bool ValidateRegistry()
     {
         lock (_lock)

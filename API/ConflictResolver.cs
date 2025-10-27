@@ -90,9 +90,6 @@ public static class ConflictResolver
         Log.Debug("[SSSUtility] ConflictResolver reset");
     }
 
-    /// <summary>
-    /// Validates that a menu's ID range doesn't conflict with existing menus.
-    /// </summary>
     public static bool ValidateIdRange(Menu newMenu)
     {
         try

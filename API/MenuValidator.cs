@@ -2,14 +2,8 @@ namespace SSSUtility.API;
 
 using SSSUtility.Models;
 
-/// <summary>
-/// Validates menu structure and configuration before registration.
-/// </summary>
 public static class MenuValidator
 {
-    /// <summary>
-    /// Validates a menu structure and returns detailed results.
-    /// </summary>
     public class ValidationResult
     {
         public bool IsValid { get; set; }
@@ -19,9 +13,6 @@ public static class MenuValidator
         public int TotalPages { get; set; }
     }
 
-    /// <summary>
-    /// Validates a menu before registration.
-    /// </summary>
     public static ValidationResult ValidateMenu(Menu menu, string pluginName)
     {
         var result = new ValidationResult();
@@ -174,17 +165,11 @@ public static class MenuValidator
         }
     }
 
-    /// <summary>
-    /// Validates that the menu's ID range doesn't conflict with existing menus.
-    /// </summary>
     public static bool ValidateIdRange(Menu menu)
     {
         return ConflictResolver.ValidateIdRange(menu);
     }
 
-    /// <summary>
-    /// Validates and logs results to console.
-    /// </summary>
     public static bool ValidateAndLog(Menu menu, string pluginName)
     {
         var result = ValidateMenu(menu, pluginName);
