@@ -72,7 +72,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error handling setting value from {hub?.nicknameSync?.MyNick ?? "unknown"}: {ex}");
+            Log.Error($"[SSSUtility] Error handling setting value from {hub?.nicknameSync?.MyNick ?? "unknown"}: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             Log.Error($"[SSSUtility] Setting ID: {setting?.SettingId ?? -1}, Type: {setting?.GetType().Name ?? "null"}");
         }
     }
@@ -88,7 +89,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error handling status: {ex}");
+            Log.Error($"[SSSUtility] Error handling status: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -126,7 +128,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in HandleButton: {ex}");
+            Log.Error($"[SSSUtility] Error in HandleButton: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -167,7 +170,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in HandleDropdown: {ex}");
+            Log.Error($"[SSSUtility] Error in HandleDropdown: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -201,7 +205,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in HandleSlider: {ex}");
+            Log.Error($"[SSSUtility] Error in HandleSlider: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -236,7 +241,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in HandleKeybind: {ex}");
+            Log.Error($"[SSSUtility] Error in HandleKeybind: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -270,7 +276,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in HandlePlaintext: {ex}");
+            Log.Error($"[SSSUtility] Error in HandlePlaintext: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -304,7 +311,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in HandleTwoButtons: {ex}");
+            Log.Error($"[SSSUtility] Error in HandleTwoButtons: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -339,7 +347,8 @@ public static class EventManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in HandleTextArea: {ex}");
+            Log.Error($"[SSSUtility] Error in HandleTextArea: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 }

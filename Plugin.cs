@@ -77,7 +77,8 @@ namespace SSSUtility
             }
             catch (Exception ex)
             {
-                Log.Error($"[SSSUtility] Error cleaning up menu state for {ev.Player?.Nickname ?? "unknown"}: {ex}");
+                Log.Error($"[SSSUtility] Error cleaning up menu state for {ev.Player?.Nickname ?? "unknown"}: {ex.Message}");
+                Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             }
         }
 

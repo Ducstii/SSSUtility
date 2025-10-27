@@ -125,9 +125,11 @@ public static class MenuRegistry
                     {
                         totalSettings += menu.GetAllSettings().Count();
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // Skip menu if we can't get settings
+                        // Skip menu if we can't get settings, but log the error
+                        Log.Error($"[SSSUtility] Failed to get settings from menu for stats: {ex.Message}");
+                        Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
                     }
                 }
             }
@@ -175,7 +177,8 @@ public static class MenuRegistry
                     }
                     catch (Exception ex)
                     {
-                        Log.Error($"[SSSUtility] Error validating menu '{menu.Name}': {ex}");
+                        Log.Error($"[SSSUtility] Error validating menu '{menu.Name}': {ex.Message}");
+                        Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
                         isValid = false;
                     }
                 }
@@ -184,7 +187,8 @@ public static class MenuRegistry
             }
             catch (Exception ex)
             {
-                Log.Error($"[SSSUtility] Error in ValidateRegistry: {ex}");
+                Log.Error($"[SSSUtility] Error in ValidateRegistry: {ex.Message}");
+                Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
                 return false;
             }
         }

@@ -18,7 +18,8 @@ public static class SettingQueries
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error getting player setting value: {ex}");
+            Log.Error($"[SSSUtility] Error getting player setting value: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             return null;
         }
     }
@@ -38,7 +39,8 @@ public static class SettingQueries
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error trying to get player setting value: {ex}");
+            Log.Error($"[SSSUtility] Error trying to get player setting value: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             return false;
         }
     }
@@ -56,7 +58,8 @@ public static class SettingQueries
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error checking if player tab is open: {ex}");
+            Log.Error($"[SSSUtility] Error checking if player tab is open: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             return false;
         }
     }
@@ -74,7 +77,8 @@ public static class SettingQueries
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error getting player version: {ex}");
+            Log.Error($"[SSSUtility] Error getting player version: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             return 0;
         }
     }
@@ -93,7 +97,8 @@ public static class SettingQueries
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error checking if menu is outdated: {ex}");
+            Log.Error($"[SSSUtility] Error checking if menu is outdated: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             return false;
         }
     }
@@ -129,7 +134,8 @@ public static class SettingQueries
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error resetting player settings: {ex}");
+            Log.Error($"[SSSUtility] Error resetting player settings: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -151,7 +157,8 @@ public static class SettingQueries
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error getting player current page: {ex}");
+            Log.Error($"[SSSUtility] Error getting player current page: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             return -1;
         }
     }

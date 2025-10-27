@@ -36,7 +36,8 @@ public static class ConflictResolver
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in AssignIdsAndRebuild: {ex}");
+            Log.Error($"[SSSUtility] Error in AssignIdsAndRebuild: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -55,7 +56,8 @@ public static class ConflictResolver
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"[SSSUtility] Error getting settings from menu '{menu.Name}': {ex}");
+                    Log.Error($"[SSSUtility] Error getting settings from menu '{menu.Name}': {ex.Message}");
+                    Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
                 }
             }
 
@@ -77,7 +79,8 @@ public static class ConflictResolver
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Critical error in RebuildDefinedSettings: {ex}");
+            Log.Error($"[SSSUtility] Critical error in RebuildDefinedSettings: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -118,7 +121,8 @@ public static class ConflictResolver
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error validating ID range: {ex}");
+            Log.Error($"[SSSUtility] Error validating ID range: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
             return false;
         }
     }

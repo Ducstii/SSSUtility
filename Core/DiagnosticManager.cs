@@ -109,7 +109,8 @@ public static class DiagnosticManager
         }
         catch (Exception ex)
         {
-            Log.Error($"Error logging diagnostics: {ex}");
+            Log.Error($"Error logging diagnostics: {ex.Message}");
+            Log.Error($"Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -154,7 +155,8 @@ public static class DiagnosticManager
         }
         catch (Exception ex)
         {
-            Log.Error($"Error logging registry stats: {ex}");
+            Log.Error($"Error logging registry stats: {ex.Message}");
+            Log.Error($"Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -190,7 +192,8 @@ public static class DiagnosticManager
         }
         catch (Exception ex)
         {
-            Log.Error($"Error validating menus: {ex}");
+            Log.Error($"Error validating menus: {ex.Message}");
+            Log.Error($"Stack trace: {ex.StackTrace}");
             return false;
         }
     }

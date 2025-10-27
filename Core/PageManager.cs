@@ -99,12 +99,25 @@ public static class PageManager
         }
         catch (Exception ex)
         {
-            Log.Error($"[SSSUtility] Error in SwitchPage: {ex}");
+            Log.Error($"[SSSUtility] Error in SwitchPage: {ex.Message}");
+            Log.Error($"[SSSUtility] Stack trace: {ex.StackTrace}");
         }
     }
 
     public static void SendMenu(ReferenceHub hub, Menu menu, int pageIndex = 0)
     {
+        if (hub == null)
+        {
+            Log.Warn("[SSSUtility] SendMenu called with null hub");
+            return;
+        }
+
+        if (menu == null)
+        {
+            Log.Warn("[SSSUtility] SendMenu called with null menu");
+            return;
+        }
+
         if (menu.Pages.Count == 0)
         {
             Log.Warn($"[SSSUtility] Menu '{menu.Name}' has no pages");
@@ -128,7 +141,7 @@ public static class PageManager
             menu.OnPlayerJoin?.Invoke(player);
         }
 
-        Log.Debug($"[SSSUtility] Sent menu '{menu.Name}' page {pageIndex} to {hub.nicknameSync.MyNick}");
+        Log.Debug($"[SSSUtility] Sent menu '{menu.Name}' page {pageIndex} to {hub.nicknameSync?.MyNick ?? "unknown"}");
     }
 
     public static void RemoveState(ReferenceHub hub)
